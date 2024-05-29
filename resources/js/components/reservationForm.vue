@@ -194,12 +194,8 @@ export default {
       json: '',
       inputs: [
         {
-          "motif": "AAAA",
-          "prompt": "AAAA AAAA AAAA \nAAAA AAAA AAAA"
-        },
-        {
-          "motif": "BBBB",
-          "prompt": "BBBB BBBB BBBB \nBBBB BBBB BBBB"
+          "motif": "",
+          "prompt": ""
         }
       ]
     };
@@ -208,9 +204,6 @@ export default {
     this.jsonFromInputs();
   },
   computed: {
-    showMainButtons() {
-      return true;
-    },
   },
   methods: {
     addInput() {
