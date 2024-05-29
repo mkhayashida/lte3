@@ -189,7 +189,7 @@ export default {
   data() {
     return {
       inputCount: 1,
-      isJsonInput: false,
+      isJsonInput: true,
       hasJsonError: false,
       json: '',
       inputs: [
