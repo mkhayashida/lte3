@@ -224,15 +224,15 @@ export default {
       jsonInput: '',
       formData: [
         {
-          "concept":"インテリコーヒー",
+          "concept":"",
           "prompts": [
             {
-              "motif": "スーツ",
-              "prompt": "aaa"
+              "motif": "",
+              "prompt": ""
             },
             {
-              "motif": "腕時計",
-              "prompt": "sss"
+              "motif": "",
+              "prompt": ""
             }
           ]
         }
