@@ -1,5 +1,5 @@
 <template>
-  <form action="/form-example" method="POST" class="w-50">
+  <form action="/form-example" method="POST" class="w-75">
     <div class="form-group">
       <label for="textInput">タイトル <span class="text-danger">*</span></label>
       <input type="text" class="form-control" id="textInput" name="textInput" placeholder="Enter text">
@@ -16,10 +16,6 @@
       </select>
     </div>
 
-    <div>
-      <span>プロンプト入力</span>
-    </div>
-
     <div class="card bg-secondary p-3 mt-2">
       <button type="button" class="btn btn-default btn-sm mb-2 position-absolute" style="right:16px; top: 10px" @click="jsonFormSwitch">
         {{isJsonInput ? 'フォーム入力' : 'json入力'}}
@@ -32,7 +28,7 @@
           </label>
           <textarea
               class="form-control mb-3"
-              v-model="json"
+              v-model="jsonInput"
               rows="10"
               placeholder="Enter text"
           ></textarea>
@@ -42,43 +38,79 @@
           </div>
 
           <div class="d-flex justify-content-end">
-            <button type="button" class="btn btn-outline-dark btn-sm" @click="parseJsonInput">実行</button>
+            <button type="button" class="btn btn-outline-dark btn-sm" @click="parseJson">実行</button>
           </div>
         </div>
       </div>
       <div id="dynamic-inputs" v-else>
-        <div v-for="(input, index) in inputs" :key="input.id" :id="'new-' + input.id">
-          <hr v-if="index > 0" style="border-color: #333;" class="mt-1" />
-          <div class="form-group">
-            <label :for="'textInput' + input.id">モチーフ</label>
+        <div v-for="(item, index) in formData" :key="index">
+          <div class="p-3 border border-dark mt-5 position-relative pt-4">
+            <label>コンセプト</label>
             <input
-                type="text"
                 class="form-control"
-                :id="'textInput' + input.id"
-                v-model="input.motif"
-                placeholder="Enter text"
+                v-model="item.concept"
+                placeholder="Concept"
+                @input="stringify"
             />
-          </div>
-          <div class="form-group">
-            <label :for="'textareaInput' + input.id">
-              プロンプト <span class="text-danger">*</span>
-            </label>
-            <textarea
-                class="form-control"
-                :id="'textareaInput' + input.id"
-                v-model="input.prompt"
-                rows="5"
-                placeholder="Enter text"
-            ></textarea>
-            <div v-if="index > 0" class="input-group-append justify-content-end mt-1">
-              <button type="button" class="btn btn-outline-dark btn-sm" @click="removeInputGroup(input.id)">ー</button>
-            </div>
-          </div>
-        </div>
 
-        <div class="d-flex justify-content-end">
-          <button type="button" class="btn btn-outline-dark align" id="add-input" @click="addInput">＋表現モチーフ追加</button>
+            <div v-for="(prompt, pIndex) in item.prompts" :key="pIndex" class="mt-3">
+              <div class="card p-4 mt-2" style="background: rgba(255,255,255,0.07)">
+                <div class="form-group">
+                  <label>モチーフ</label>
+                  <input
+                      class="form-control"
+                      type="text"
+                      v-model="prompt.motif"
+                      placeholder="Motif"
+                      @input="stringify"
+                  />
+                </div>
+                <div class="form-group">
+                  <label>
+                    プロンプト <span class="text-danger">*</span>
+                  </label>
+                  <textarea
+                      class="form-control"
+                      v-model="prompt.prompt"
+                      rows="5"
+                      placeholder="Prompt"
+                      @input="stringify"
+                  ></textarea>
+                  <div v-if="pIndex > 0" class="input-group-append justify-content-end mt-1">
+                    <button
+                        v-if="pIndex > 0"
+                        type="button"
+                        style="right: 10px; top: 10px;"
+                        class="btn btn-outline-dark btn-sm position-absolute"
+                        @click="deletePrompt(index, pIndex)">ー</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button
+                v-if="index > 0"
+                type="button"
+                style="right: 10px; top: 10px;"
+                class="btn btn-outline-dark btn-sm position-absolute"
+                @click="deleteMainItem(index)">
+              コンセプト
+              <i class="fas fa-minus-square"></i>
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-default float-right"
+                @click="addPrompt(index)">＋</button>
+            <div class="clearfix"></div>
+          </div>
+
         </div>
+        <button
+            type="button"
+            style="margin: 0 auto; display: block"
+            class="btn btn-outline-dark mt-4 mb-4"
+            @click="addMainItem">コンセプト ＋</button>
       </div>
     </div>
 
@@ -188,70 +220,64 @@ export default {
   name: 'ReservationForm',
   data() {
     return {
-      inputCount: 1,
       isJsonInput: true,
-      hasJsonError: false,
-      json: '',
-      inputs: [
+      jsonInput: '',
+      formData: [
         {
-          "motif": "",
-          "prompt": ""
+          "concept":"インテリコーヒー",
+          "prompts": [
+            {
+              "motif": "スーツ",
+              "prompt": "aaa"
+            },
+            {
+              "motif": "腕時計",
+              "prompt": "sss"
+            }
+          ]
         }
       ]
     };
   },
   mounted() {
-    this.jsonFromInputs();
-  },
-  computed: {
+    this.stringify();
   },
   methods: {
-    addInput() {
-      this.inputCount++;
-      this.inputs.push({ id: this.inputCount, motif: '', prompt: '' });
+    parseJson() {
+      try {
+        this.formData = JSON.parse(this.jsonInput);
+      } catch (e) {
+        console.error("Invalid JSON");
+        alert('Invalid JSON input. Please correct it and try again.');
+      }
     },
-    removeInputGroup(id) {
-      this.inputs = this.inputs.filter(input => input.id !== id);
+    stringify() {
+      this.jsonInput = JSON.stringify(this.formData, null, 2);
+    },
+    addPrompt(index) {
+      this.formData[index].prompts.push({ motif: "", prompt: "" });
+    },
+    deletePrompt(mainIndex, promptIndex) {
+      this.formData[mainIndex].prompts.splice(promptIndex, 1);
+    },
+    addMainItem() {
+      this.formData.push({
+        concept: "",
+        prompts: [{ motif: "", prompt: "" }]
+      });
+    },
+    deleteMainItem(index) {
+      this.formData.splice(index, 1);
     },
     jsonFormSwitch() {
       this.isJsonInput = !this.isJsonInput;
 
       if (this.isJsonInput) {
-        this.jsonFromInputs();
+        //this.jsonFromInputs();
       }
     },
-    parseJsonInput() {
-      try {
-        const inputArray = JSON.parse(this.json);
-
-        // Generate the new JSON with id parameter
-        this.inputs = inputArray.map((item, index) => ({
-          id: index + 1,
-          ...item
-        }));
-
-        this.jsonFormSwitch();
-        this.hasJsonError = false;
-      } catch (error) {
-        this.hasJsonError = true;
-      }
-    },
-    jsonFromInputs() {
-      try {
-        // Generate the new JSON with id parameter
-        const array = this.inputs.map((item, index) => ({
-          motif: item.motif,
-          prompt: item.prompt
-        }));
-
-        this.json = JSON.stringify(array, null, 2);
-      } catch (error) {
-        console.error('Invalid JSON:', error);
-        alert('Invalid JSON input. Please correct it and try again.');
-      }
-    }
   }
-}
+};
 </script>
 
 <style scoped>
