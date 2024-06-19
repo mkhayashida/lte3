@@ -96,14 +96,18 @@ export default {
   },
   methods: {
     fetchLuckyBagData() {
-      //this.loading = true;
-      //this.luckyBagData = null;
-      axios.get('https://wap-api.17app.co/api/v1/gift/luckybag')
-          .then(response => {
-            const luckyBags = response.data.luckyBags;
+      // Fetch lucky bag data
+      fetch('https://wap-api.17app.co/api/v1/gift/luckybag', {
+        method: 'GET',
+        referrerPolicy: 'no-referrer-when-downgrade'
+      })
+          .then(response => response.json())
+          .then(data => {
+            const luckyBags = data.luckyBags;
             const filteredLuckyBags = luckyBags.find(bag => bag.giftID === '2406_jp_snowwhite_bag_sc');
             this.luckyBagData = filteredLuckyBags || null;
             if (this.luckyBagData) {
+              this.timestamp = this.luckyBagData.timestamp;
               this.updateTimePassed();
               if (this.timerId) {
                 clearInterval(this.timerId);
@@ -117,16 +121,18 @@ export default {
             this.loading = false;
           });
 
-      //this.rankLoading = true;
-      //this.rankData = null;
-      axios.get('https://wap-api.17app.co/api/v1/leaderboards/eventory?containerID=fa3a73d6-06d8-4a98-abfa-b61953d62b15&cursor=&count=20')
-          .then(response => {
-            this.rankData = response.data.data;
-
+      // Fetch rank data
+      fetch('https://wap-api.17app.co/api/v1/leaderboards/eventory?containerID=fa3a73d6-06d8-4a98-abfa-b61953d62b15&cursor=&count=20', {
+        method: 'GET',
+        referrerPolicy: 'no-referrer-when-downgrade'
+      })
+          .then(response => response.json())
+          .then(data => {
+            this.rankData = data.data;
             this.rankLoading = false;
           })
           .catch(error => {
-            console.error('Error fetching lucky bag data:', error);
+            console.error('Error fetching rank data:', error);
             this.rankLoading = false;
           });
     },
