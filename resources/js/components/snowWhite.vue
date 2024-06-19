@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="main">
     <div v-if="loading">Loading...</div>
     <div v-else>
       <h1>魔法の鏡チャレンジ</h1>
@@ -209,6 +209,7 @@ h1 {
   width: 95%;
   background: #555;
   border-radius: 4px;
+  padding-bottom: 10px;
 }
 .rank-table {
   width: 100%;
@@ -221,5 +222,9 @@ h1 {
 }
 .ta-r {
   text-align: right;
+}
+.main {
+  max-width: 500px;
+  margin: 0 auto;
 }
 </style>
