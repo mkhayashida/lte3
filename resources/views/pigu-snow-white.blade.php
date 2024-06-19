@@ -7,6 +7,7 @@
     @vite(['resources/js/app.js'])
     <style>
         html,body {
+            font-family: "Hiragino Kaku Gothic Pro", Osaka, Meiryo, "MS PGothic", Arial, sans-serif;
             background: #333;
             color: #eee;
             font-size: 11px;
