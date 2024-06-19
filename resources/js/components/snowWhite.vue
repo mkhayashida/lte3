@@ -97,7 +97,7 @@ export default {
   methods: {
     fetchLuckyBagData() {
       // Fetch lucky bag data
-      fetch('https://wap-api.17app.co/api/v1/gift/luckybag', {
+      fetch('/jackpot', {
         method: 'GET',
         referrerPolicy: 'no-referrer-when-downgrade'
       })
@@ -122,7 +122,7 @@ export default {
           });
 
       // Fetch rank data
-      fetch('https://wap-api.17app.co/api/v1/leaderboards/eventory?containerID=fa3a73d6-06d8-4a98-abfa-b61953d62b15&cursor=&count=20', {
+      fetch('/rank', {
         method: 'GET',
         referrerPolicy: 'no-referrer-when-downgrade'
       })
